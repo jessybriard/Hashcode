@@ -35,4 +35,14 @@ public class Street {
     public void addCar(Car car) {
         waitingCars.add(car);
     }
+
+    public void greenLight(int time) {
+        for (int i=0; i<time; i++) {
+            if (! waitingCars.isEmpty()) {
+                Car car = waitingCars.remove();
+                car.crossIntersection();
+            }
+        }
+    }
+
 }

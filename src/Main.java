@@ -7,6 +7,8 @@ import java.util.Scanner;
 
 public class Main {
 
+    public static int currentTime = 0;
+
     public static void main(String[] args) throws FileNotFoundException {
         System.out.println("Hello World!");
         Scanner input = new Scanner(new File("src/a.txt"));
@@ -45,14 +47,25 @@ public class Main {
         ArrayList<Car> cars = new ArrayList<>();
         for (int i=nbStreets+1; i<=(nbStreets+nbCars); i++) {
             String data = inputData.get(i);
-            cars.add(new Car(data.substring((data.split(" ")[0]).length()+1)));
+            String pathString = data.substring((data.split(" ")[0]).length()+1);
+            Car newCar = new Car();
+            for (String streetString: pathString.split(" ")) {
+                newCar.addStreet(streets.get(streetString));
+            }
+            cars.add(newCar);
             //System.out.println(data.substring((data.split(" ")[0]).length()+1));
         }
 
         for (Car car: cars) {
-            String initStreetString = car.getStreet();
-            Street initStreet = streets.get(initStreetString);
+            Street initStreet = car.getStreet();
             initStreet.addCar(car);
+        }
+
+        // SIMULATION
+        while (currentTime<simDuration) {
+
+
+            currentTime++;
         }
 
     }

@@ -4,15 +4,28 @@ import java.util.Queue;
 
 public class Car {
 
-    private Queue<String> path = new LinkedList<>();
+    private Queue<Street> path = new LinkedList<>();
 
-    public Car(String data) {
-        path.addAll(Arrays.asList(data.split(" ")));
-    }
+    public Car() {}
 
-    public String getStreet()
+    public Street getStreet()
     {
         return path.element();
+    }
+
+    public void addStreet(Street street) {
+        path.add(street);
+    }
+
+    public void crossIntersection()
+    {
+        path.remove();
+        if (! path.isEmpty()) {
+            Street newStreet = path.element();
+            newStreet.addCar(this);
+        } else {
+            // CAR has finished path, calculate score
+        }
     }
 
 }
