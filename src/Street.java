@@ -1,9 +1,13 @@
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class Street {
 
-    int startInt;
-    int endInt;
-    String name;
-    int time;
+    private int startInt;
+    private int endInt;
+    private String name;
+    private int time;
+    private Queue<Car> waitingCars = new LinkedList<>();
 
     public Street(String startInt, String endInt, String name, String time) {
         this.startInt = Integer.parseInt(startInt);
@@ -26,5 +30,9 @@ public class Street {
 
     public int getTime() {
         return time;
+    }
+
+    public void addCar(Car car) {
+        waitingCars.add(car);
     }
 }

@@ -24,14 +24,36 @@ public class Main {
         int nbCars = Integer.parseInt(data1[3]);
         int bonusPoints = Integer.parseInt(data1[4]);
 
-        HashMap<String, Street> streets = new HashMap<>();
+        ArrayList<Intersection> intersections = new ArrayList<>();
+        for (int i=0; i<nbIntersections; i++) {
+            intersections.add(new Intersection());
+        }
 
+        HashMap<String, Street> streets = new HashMap<>();
         for (int i=1; i<=nbStreets; i++) {
             String[] data = inputData.get(i).split(" ");
             streets.put(data[2], new Street(data[0], data[1], data[2], data[3]));
         }
 
-        
+        for (Street street: streets.values()) {
+            int fromInt = street.getStartInt();
+            int endInt = street.getEndInt();
+            intersections.get(fromInt).setOutcomingStreet(street);
+            intersections.get(endInt).setIncomingStreet(street);
+        }
+
+        ArrayList<Car> cars = new ArrayList<>();
+        for (int i=nbStreets+1; i<=(nbStreets+nbCars); i++) {
+            String data = inputData.get(i);
+            cars.add(new Car(data.substring((data.split(" ")[0]).length()+1)));
+            //System.out.println(data.substring((data.split(" ")[0]).length()+1));
+        }
+
+        for (Car car: cars) {
+            String initStreetString = car.getStreet();
+            Street initStreet = streets.get(initStreetString);
+            initStreet.addCar(car);
+        }
 
     }
 
