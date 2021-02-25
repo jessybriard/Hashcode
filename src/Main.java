@@ -8,10 +8,13 @@ import java.util.Scanner;
 
 public class Main {
 
-    public int currentTime = 0;
-    public int simulationDuration = 0;
+    public static int points = 0;
 
-    HashMap
+    public static int currentTime = -1;
+    public static int simulationDuration = 0;
+
+    public static HashMap<String, Street> streetsMap = new HashMap<>();
+    public static ArrayList<Car> cars = new ArrayList<>(); 
 
     public static void main(String[] args) throws FileNotFoundException {
         System.out.println("Hello World!");
@@ -37,9 +40,10 @@ public class Main {
         for (int i=1; i<=nbStreets; i++) {
             String[] data = inputData.get(i).split(" ");
             streets.put(data[2], new Street(data[0], data[1], data[2], data[3]));
+            streetsMap.put(data[2], new Street(data[0], data[1], data[2], data[3]));
         }
 
-        for(Intersection inter : Intersection.intersections.values()){
+        /*for(Intersection inter : Intersection.intersections.values()){
             System.out.println("Intersection id: " + inter.getId());
             System.out.println("Incoming Streets: ");
             for(Street str : inter.getIncomingStreets()){
@@ -49,7 +53,7 @@ public class Main {
             for(Street str : inter.getOutgoingStreets()){
                 System.out.println(str.getName() + " ");
             }
-        }
+        }*/
 
         /*for (Street street: streets.values()) {
             int fromInt = street.getStartInt();
@@ -58,14 +62,16 @@ public class Main {
             intersections.get(endInt).setIncomingStreet(street);
         }*/
 
-        ArrayList<Car> cars = new ArrayList<>();
+        
         for (int i=nbStreets+1; i<=(nbStreets+nbCars); i++) {
             String data = inputData.get(i);
             String pathString = data.substring((data.split(" ")[0]).length()+1);
-            Car newCar = new Car();
+            
+            Queue<Street> path = new LinkedList<>();
             for (String streetString: pathString.split(" ")) {
-                newCar.addStreet(streets.get(streetString));
+                path.add(streets.get(streetString));
             }
+            Car newCar = new Car(path);
             cars.add(newCar);
             //System.out.println(data.substring((data.split(" ")[0]).length()+1));
         }
@@ -76,23 +82,38 @@ public class Main {
         }
 
         // SIMULATION
-        while (currentTime<simDuration) {
-
-
-            currentTime++;
+        while (currentTime<1000) {
+            step();
         }
 
+
+        System.out.println("\n\n\nTotal points: " + points);
+        for (Car oneCar : cars) {
+            System.out.println("Car location: " + oneCar.getStreet().getName());
+        }
+
+        for (Street str : streetsMap.values()) {
+            String green = "";
+            if(str.isGreen()){
+                green = "green";
+            }
+            else{green = "red";}
+            System.out.println("Street " + str.getName() + " is currently " + green);
+        }
     }
 
-    public void step()
+    public static void step()
     {
         for(Intersection inter : Intersection.intersections.values()){
+
             int chosenIndex = 0;
             ArrayList<Car> lineup = new ArrayList<>();
             for(Street str : inter.getIncomingStreets()){
-                lineup.add(str.checkNextCar());
+                if(str.hasNextCar()){
+                    lineup.add(str.checkNextCar());
+                }
             }
-            if(!lineup.isEmpty() && lineup.size() > 1){
+            if(!lineup.isEmpty() && lineup.size() >= 2){
                 for(int i = 1; i < lineup.size(); i++){
                     if(lineup.get(i).getPathLength() < lineup.get(chosenIndex).getPathLength()){
                         chosenIndex = i;
@@ -103,6 +124,23 @@ public class Main {
                 inter.setGreenFor(lineup.get(chosenIndex).getStreet());
             }
         }
+
+        for(Street str : streetsMap.values()){
+            str.moveCars();
+        }
+
+        if(currentTime > -1){
+            for(Car c : cars){
+                c.drive();
+            }
+        }
+
+        currentTime++;
+    }
+
+    public static void arrivedCar(Car removingCar){
+        points += 1000 + (simulationDuration - currentTime);
+        cars.remove(removingCar);
     }
 
 }

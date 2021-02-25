@@ -48,7 +48,22 @@ public class Street {
     }
 
     public void addCar(Car car) {
-        waitingCars.add(car);
+        if(!waitingCars.contains(car)){
+            waitingCars.add(car);
+        }
+        if(waitingCars.size() == 1){
+            moveCars();
+        }
+    }
+
+    public void moveCars(){
+        if(green){
+            waitingCars.remove().crossIntersection();
+        }
+    }
+
+    public boolean hasNextCar(){
+        return !waitingCars.isEmpty();
     }
 
     public Car checkNextCar(){
@@ -66,6 +81,10 @@ public class Street {
 
     public void setGreen(boolean gr){
         green = gr;
+    }
+
+    public boolean isGreen(){
+        return green;
     }
 
 }
