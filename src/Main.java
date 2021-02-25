@@ -1,3 +1,4 @@
+import java.util.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -7,7 +8,10 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static int currentTime = 0;
+    public int currentTime = 0;
+    public int simulationDuration = 0;
+
+    HashMap
 
     public static void main(String[] args) throws FileNotFoundException {
         System.out.println("Hello World!");
@@ -21,15 +25,13 @@ public class Main {
 
         String[] data1 = inputData.get(0).split(" ");
         int simDuration = Integer.parseInt(data1[0]);
+        simulationDuration = simDuration;
         int nbIntersections = Integer.parseInt(data1[1]);
         int nbStreets = Integer.parseInt(data1[2]);
         int nbCars = Integer.parseInt(data1[3]);
         int bonusPoints = Integer.parseInt(data1[4]);
 
-        ArrayList<Intersection> intersections = new ArrayList<>();
-        for (int i=0; i<nbIntersections; i++) {
-            intersections.add(new Intersection());
-        }
+
 
         HashMap<String, Street> streets = new HashMap<>();
         for (int i=1; i<=nbStreets; i++) {
@@ -37,12 +39,24 @@ public class Main {
             streets.put(data[2], new Street(data[0], data[1], data[2], data[3]));
         }
 
-        for (Street street: streets.values()) {
+        for(Intersection inter : Intersection.intersections.values()){
+            System.out.println("Intersection id: " + inter.getId());
+            System.out.println("Incoming Streets: ");
+            for(Street str : inter.getIncomingStreets()){
+                System.out.println(str.getName() + " ");
+            }
+            System.out.println("Outgoing Streets: ");
+            for(Street str : inter.getOutgoingStreets()){
+                System.out.println(str.getName() + " ");
+            }
+        }
+
+        /*for (Street street: streets.values()) {
             int fromInt = street.getStartInt();
             int endInt = street.getEndInt();
             intersections.get(fromInt).setOutcomingStreet(street);
             intersections.get(endInt).setIncomingStreet(street);
-        }
+        }*/
 
         ArrayList<Car> cars = new ArrayList<>();
         for (int i=nbStreets+1; i<=(nbStreets+nbCars); i++) {
@@ -68,6 +82,27 @@ public class Main {
             currentTime++;
         }
 
+    }
+
+    public void step()
+    {
+        for(Intersection inter : Intersection.intersections.values()){
+            int chosenIndex = 0;
+            ArrayList<Car> lineup = new ArrayList<>();
+            for(Street str : inter.getIncomingStreets()){
+                lineup.add(str.checkNextCar());
+            }
+            if(!lineup.isEmpty() && lineup.size() > 1){
+                for(int i = 1; i < lineup.size(); i++){
+                    if(lineup.get(i).getPathLength() < lineup.get(chosenIndex).getPathLength()){
+                        chosenIndex = i;
+                    }
+                }
+            }
+            if(!lineup.isEmpty()){
+                inter.setGreenFor(lineup.get(chosenIndex).getStreet());
+            }
+        }
     }
 
 }

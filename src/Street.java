@@ -1,3 +1,4 @@
+import java.util.*;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -16,6 +17,18 @@ public class Street {
         this.endInt = Integer.parseInt(endInt);
         this.name = name;
         this.time = Integer.parseInt(time);
+
+        if(!Intersection.intersections.containsKey(this.startInt)){
+            System.out.println("Putting the intersection with id: " + this.startInt);
+            Intersection.intersections.put(this.startInt, new Intersection(this.startInt));
+        }
+        if(!Intersection.intersections.containsKey(this.endInt)){
+            System.out.println("Putting the intersection with id: " + this.endInt);
+            Intersection.intersections.put(this.endInt, new Intersection(this.endInt));
+        }
+
+        Intersection.intersections.get(this.startInt).setOutgoingStreet(this);
+        Intersection.intersections.get(this.endInt).setIncomingStreet(this);
     }
 
     public int getStartInt() {
@@ -38,6 +51,10 @@ public class Street {
         waitingCars.add(car);
     }
 
+    public Car checkNextCar(){
+        return waitingCars.peek();
+    }
+
     public void greenLight(int time) {
         for (int i=0; i<time; i++) {
             if (! waitingCars.isEmpty()) {
@@ -45,6 +62,10 @@ public class Street {
                 car.crossIntersection();
             }
         }
+    }
+
+    public void setGreen(boolean gr){
+        green = gr;
     }
 
 }
