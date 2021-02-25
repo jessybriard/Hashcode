@@ -24,7 +24,7 @@ public class Car {
             Street newStreet = path.element();
             newStreet.addCar(this);
         } else {
-            // CAR has finished path, calculate score
+            Main.moreOrLessScore += Main.bonusPoints;
         }
     }
 

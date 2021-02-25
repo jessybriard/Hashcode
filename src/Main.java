@@ -11,15 +11,18 @@ public class Main {
 
     private String dataSet = "a";
     public static int currentTime = 0;
+    public static int moreOrLessScore = 0;
     private List<String> inputData;
     private int simDuration;
     private int nbIntersections;
     private int nbStreets;
     private int nbCars;
-    private int bonusPoints;
+    public static int bonusPoints;
     private ArrayList<Intersection> intersections;
     private HashMap<String, Street> streets;
     private ArrayList<Car> cars;
+    private HashMap<Integer,String> bestSchedule;
+    private int n=1000; // Number of simulations, varied according to data size
 
     public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
         Main main = new Main();
@@ -35,7 +38,10 @@ public class Main {
             String answer = input.nextLine();
             inputData.add(answer);
         }
-        System.out.println(inputData);
+        //System.out.println(inputData);
+
+        currentTime = 0;
+        moreOrLessScore = 0;
 
         String[] data1 = inputData.get(0).split(" ");
         simDuration = Integer.parseInt(data1[0]);
@@ -83,8 +89,6 @@ public class Main {
 
     public void run() throws FileNotFoundException, UnsupportedEncodingException {
 
-        reset();
-
         // SIMULATION
         /**while (currentTime<simDuration) {
 
@@ -92,45 +96,119 @@ public class Main {
             currentTime++;
         }*/
 
-
-        for (int i=0; i<intersections.size(); i++) {
-
-        }
-
-
-        int minimumPath = cars.get(0).getPathLength();
-        Car minPathCar = cars.get(0);
-        for (Car car: cars) {
-            int pathLength = car.getPathLength();
-            if (pathLength<minimumPath) {
-                minimumPath = pathLength;
-                minPathCar = car;
+        int maxScore = 0;
+        for (int i=0; i<n; i++) {
+            reset();
+            int score = simulate();
+            System.out.println(score);
+            if (score > maxScore) {
+                maxScore = score;
+                getCurrentSchedule();
             }
         }
 
-        ArrayList<String> schedules = new ArrayList<>();
-        while (minPathCar.getPathLength() > 0) {
-            Street currentStreet = minPathCar.getStreet();
-            int position = currentStreet.getPosition(minPathCar);
-            currentStreet.greenLight(position);
-            schedules.add(currentStreet.getIntersection() + " " + currentStreet.getName());
-            //System.out.println(currentStreet.getIntersection() + " - " + currentStreet.getName());
+        if (maxScore != 0) {
+
+            System.out.println();
+            System.out.println(maxScore);
+
+            System.out.println();
+            System.out.println(bestSchedule.size());
+            for (Integer intersection : bestSchedule.keySet()) {
+                System.out.println(intersection);
+                String[] scheduleData = bestSchedule.get(intersection).split("/");
+                for (String data : scheduleData) {
+                    System.out.println(data);
+                }
+            }
+
+            PrintWriter writer = new PrintWriter(dataSet + "_submission.txt", "UTF-8");
+            writer.println(bestSchedule.size());
+            for (Integer intersection : bestSchedule.keySet()) {
+                writer.println(intersection);
+                String[] scheduleData = bestSchedule.get(intersection).split("/");
+                for (String data : scheduleData) {
+                    writer.println(data);
+                }
+            }
+            writer.close();
+        } else {
+
+            reset();
+
+            int minimumPath = cars.get(0).getPathLength();
+            Car minPathCar = cars.get(0);
+            for (Car car : cars) {
+                int pathLength = car.getPathLength();
+                if (pathLength < minimumPath) {
+                    minimumPath = pathLength;
+                    minPathCar = car;
+                }
+            }
+
+            ArrayList<String> schedules = new ArrayList<>();
+            while (minPathCar.getPathLength() > 0) {
+                Street currentStreet = minPathCar.getStreet();
+                int position = currentStreet.getPosition(minPathCar);
+                currentStreet.greenLight(position);
+                schedules.add(currentStreet.getIntersection() + " " + currentStreet.getName());
+                //System.out.println(currentStreet.getIntersection() + " - " + currentStreet.getName());
+            }
+
+            writeFile(schedules);
+
         }
 
-        writeFile(schedules);
+    }
 
+    private void getCurrentSchedule() {
+        bestSchedule = new HashMap<Integer, String>();
+        for (int i=0; i<intersections.size(); i++) {
+            String intSchedule = intersections.get(i).getSchedule();
+            if (! intSchedule.isEmpty()) {
+                bestSchedule.put(i, intersections.get(i).getSchedule());
+            }
+        }
     }
 
     public void writeFile(ArrayList<String> schedules) throws FileNotFoundException, UnsupportedEncodingException {
         PrintWriter writer = new PrintWriter(dataSet + "_submission.txt", "UTF-8");
         writer.println(schedules.size());
-        for (String schedule: schedules) {
-            String[] scheduleData = schedule.split(" ");
+        for (String string: schedules) {
+            String[] scheduleData = string.split(" ");
             writer.println(scheduleData[0]);
             writer.println("1");
             writer.println(scheduleData[1] + " 1");
         }
         writer.close();
+
+        System.out.println(schedules.size());
+        for (String string: schedules) {
+            String[] scheduleData = string.split(" ");
+            System.out.println(scheduleData[0]);
+            System.out.println("1");
+            System.out.println(scheduleData[1] + " 1");
+        }
+        writer.close();
+    }
+
+
+    public int simulate()
+    {
+
+        // random scheduling
+        for (Intersection intersection: intersections) {
+            intersection.randomSchedule();
+        }
+
+        for (int i=0; i<simDuration; i++) {
+            currentTime++;
+            for (Intersection intersection: intersections) {
+                intersection.step();
+            }
+        }
+
+        return moreOrLessScore;
     }
 
 }
