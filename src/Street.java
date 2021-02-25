@@ -8,8 +8,10 @@ public class Street {
     private String name;
     private int time;
     private Queue<Car> waitingCars = new LinkedList<>();
+    private boolean green;
 
     public Street(String startInt, String endInt, String name, String time) {
+        this.green = false;
         this.startInt = Integer.parseInt(startInt);
         this.endInt = Integer.parseInt(endInt);
         this.name = name;
