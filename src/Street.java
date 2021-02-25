@@ -47,4 +47,19 @@ public class Street {
         }
     }
 
+    public int getPosition(Car car) {
+        Object[] cars = waitingCars.toArray();
+        for (int i=0; i<cars.length; i++) {
+            if (cars[i] == car) {
+                return i+1;
+            }
+        }
+        return 0;
+    }
+
+    public int getIntersection()
+    {
+        return endInt;
+    }
+
 }

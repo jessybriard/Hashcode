@@ -28,4 +28,9 @@ public class Car {
         }
     }
 
+    public int getPathLength()
+    {
+        return path.size();
+    }
+
 }

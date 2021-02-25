@@ -1,13 +1,15 @@
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 public class Intersection {
 
-    private Set<Street> incomingStreets = new HashSet<>();
-    private Set<Street> outcomingStreets = new HashSet<>();
+    private ArrayList<Street> incomingStreets = new ArrayList<>();
+    private ArrayList<Street> outcomingStreets = new ArrayList<>();
+    private HashMap<Street, Integer> time
 
 
-    public Set<Street> getIncomingStreets() {
+    public ArrayList<Street> getIncomingStreets() {
         return incomingStreets;
     }
 
@@ -15,12 +17,21 @@ public class Intersection {
         incomingStreets.add(incomingStreet);
     }
 
-    public Set<Street> getOutcomingStreets() {
+    public ArrayList<Street> getOutcomingStreets() {
         return outcomingStreets;
     }
 
     public void setOutcomingStreet(Street outcomingStreet) {
         outcomingStreets.add(outcomingStreet);
+    }
+
+    public int getNbTrafficLights()
+    {
+        return incomingStreets.size();
+    }
+
+    public void setGLTime(Street street, int time) {
+
     }
 
 }
